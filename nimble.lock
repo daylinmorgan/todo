@@ -1,0 +1,63 @@
+{
+  "version": 2,
+  "packages": {
+    "cligen": {
+      "version": "1.6.14",
+      "vcsRevision": "bee21f2d0878d4eba4631fd8b67370e4778424de",
+      "url": "https://github.com/c-blake/cligen.git",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "195164d6a417c5393ee8aac1d1c2dfb0d45574b1"
+      }
+    },
+    "unicodedb": {
+      "version": "0.12.0",
+      "vcsRevision": "b055310c08db8f879057b4fec15c8301ee93bb2a",
+      "url": "https://github.com/nitely/nim-unicodedb",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "4452416471e2fe8726eb6070ed6ea7368171cc09"
+      }
+    },
+    "regex": {
+      "version": "0.21.0",
+      "vcsRevision": "199e696a1b0e0db72e2e5a657926e5b944e6ae2d",
+      "url": "https://github.com/nitely/nim-regex",
+      "downloadMethod": "git",
+      "dependencies": [
+        "unicodedb"
+      ],
+      "checksums": {
+        "sha1": "e721938908feadfcf2c98582a4261df3fd98fbf1"
+      }
+    },
+    "yaml": {
+      "version": "1.1.0",
+      "vcsRevision": "ab3ff9fad45fa7e20d749d0a03a7567225f5dd4a",
+      "url": "https://github.com/flyx/NimYAML",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "69800cc68996ea75203b1d3aa706fb37909dada1"
+      }
+    }
+  },
+  "tasks": {
+    "release": {
+      "ccnz": {
+        "version": "2023.1001",
+        "vcsRevision": "9dc6353e8b0cc793bc2ae5d089593e24d122ee22",
+        "url": "https://github.com/daylinmorgan/ccnz",
+        "downloadMethod": "git",
+        "dependencies": [
+          "cligen"
+        ],
+        "checksums": {
+          "sha1": "e758c69ceb0977dca7069209c20efe6825801517"
+        }
+      }
+    }
+  }
+}
