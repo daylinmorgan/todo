@@ -44,20 +44,5 @@
       }
     }
   },
-  "tasks": {
-    "release": {
-      "ccnz": {
-        "version": "2023.1001",
-        "vcsRevision": "9dc6353e8b0cc793bc2ae5d089593e24d122ee22",
-        "url": "https://github.com/daylinmorgan/ccnz",
-        "downloadMethod": "git",
-        "dependencies": [
-          "cligen"
-        ],
-        "checksums": {
-          "sha1": "e758c69ceb0977dca7069209c20efe6825801517"
-        }
-      }
-    }
-  }
+  "tasks": {}
 }
