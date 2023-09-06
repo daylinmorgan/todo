@@ -33,21 +33,20 @@ task release, "build release assets":
     let
       app = projectName()
       ext = if target == "x86_64-windows-gnu": ".exe" else: ""
-      outdir = &"dist/{target}/"
+      outdir = &"dist/{app}-v{version}-{target}/"
     exec &"ccnz cc --target {target} --nimble -- --out:{outdir}{app}{ext} -d:release src/{app}"
 
 task bundle, "package build assets":
   cd "dist"
   for target in targets:
-    let 
-      app = projectName()
-      cmd = 
+    let
+      archiveName = &"{projectName()}-v{version}-{target}"
+      cmd =
         if target == "x86_64-windows-gnu":
-          &"7z a {app}_{target}.zip {target}"
+          &"7z a {archiveName}.zip {archiveName}"
         else:
-          &"tar czf {app}_{target}.tar.gz {target}"
-
-    cpFile("../README.md", &"{target}/README.md")
+          &"tar czf {archiveName}.tar.gz {archiveName}"
+    cpFile("../README.md", &"{archiveName}/README.md")
     exec cmd
 
 
