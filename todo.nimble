@@ -20,7 +20,7 @@ requires "nim >= 1.6.10",
 import strformat
 
 task release, "build release assets":
-  version = (gorgeEx "git describe --tags --always").output
+  version = (gorgeEx "git describe --tags --always --match 'v*'").output
   exec &"forge release -v {version} -V"
 
 task bundle, "package build assets":
