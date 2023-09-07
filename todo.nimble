@@ -18,36 +18,19 @@ requires "nim >= 1.6.10",
 
 
 import strformat
-const targets = [
-    "x86_64-linux-gnu",
-    "aarch64-linux-gnu",
-    "x86_64-linux-musl",
-    "x86_64-macos-none",
-    "aarch64-macos-none",
-    "x86_64-windows-gnu"
-  ]
 
 task release, "build release assets":
-  mkdir "dist"
-  for target in targets:
-    let
-      app = projectName()
-      ext = if target == "x86_64-windows-gnu": ".exe" else: ""
-      outdir = &"dist/{app}-v{version}-{target}/"
-    exec &"ccnz cc --target {target} --nimble -- --out:{outdir}{app}{ext} -d:release src/{app}"
+  version = (gorgeEx "git describe --tags --always").output
+  exec &"forge release -v {version} -V"
 
 task bundle, "package build assets":
-  cd "dist"
-  for target in targets:
-    let
-      archiveName = &"{projectName()}-v{version}-{target}"
-      cmd =
-        if target == "x86_64-windows-gnu":
-          &"7z a {archiveName}.zip {archiveName}"
-        else:
-          &"tar czf {archiveName}.tar.gz {archiveName}"
-    cpFile("../README.md", &"{archiveName}/README.md")
-    exec cmd
-
+  withDir "dist":
+    for dir in listDirs("."):
+      let cmd = if "windows" in dir:
+        &"7z a {dir}.zip {dir}"
+      else: 
+        &"tar czf {dir}.tar.gz {dir}"
+      cpFile("../README.md", &"{dir}/README.md")
+      exec cmd
 
 

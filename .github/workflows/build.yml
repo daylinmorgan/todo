@@ -23,12 +23,13 @@ jobs:
         with:
           nim-version: 2.0.0
 
-      # for cross compilation with ccnz
       - uses: goto-bus-stop/setup-zig@v2
+
+      - run: nimble install -Y https://github.com/daylinmorgan/forge
 
       - name: Generate build artifacts
         run: |
-          nimble install -Y https://github.com/daylinmorgan/ccnz
+          nimble install -Y https://github.com/daylinmorgan/forge
           nimble release
 
       - name: Create artifact bundles
