@@ -25,8 +25,6 @@ jobs:
 
       - uses: goto-bus-stop/setup-zig@v2
 
-      - run: nimble install -Y https://github.com/daylinmorgan/forge
-
       - name: Generate build artifacts
         run: |
           nimble install -Y https://github.com/daylinmorgan/forge
