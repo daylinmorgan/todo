@@ -14,7 +14,8 @@ binDir        = "bin"
 requires "nim >= 1.6.10",
          "cligen",
          "regex",
-         "yaml"
+         "yaml",
+         "https://github.com/daylinmorgan/bbansi#head"
 
 
 import strformat

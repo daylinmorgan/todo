@@ -2,7 +2,7 @@ import std/[enumerate, os, sequtils, strformat, strutils, tables, times,
     sugar, wordwrap]
 
 import regex
-
+import bbansi
 import ansi
 
 type
@@ -45,20 +45,20 @@ proc status*(t: Todo, p: string): string =
           complete: $t.complete,
           incomplete: $t.incomplete)
 
-  return "  " & (@[
-      p.bold,
-      icons.checked & " " & row.complete.green,
-      icons.unchecked & " " & row.incomplete.red,
+  return ("  " & (@[
+      $p.bb("b"),
+      icons.checked & " " & $row.complete.bb("green"),
+      icons.unchecked & " " & $row.incomplete.bb("red"),
     ]
     ).join(" | ")
-
+    )
 
 proc addStylizedLine(t: var Todo, task: var Task): seq[int] =
   if task.complete:
     let stylizedLine = task.indent & icons.checked & " " & task.task.wrapWords(
         maxLineWidth = maxScreenWidth,
         newline = &"\n{task.indent}  {icons.wrap} ").split("\n").mapIt(
-        it.dim.strike).join("\n")
+        $it.bb("faint strike")).join("\n")
 
     let hideLines = collect:
       for i in 1..len(stylizedLine.splitLines()):
@@ -77,8 +77,8 @@ proc addStylizedLine(t: var Todo, s: string, indent: string = "") =
   t.stylized = t.stylized & s.wrapWords(maxLineWidth = maxScreenWidth,
       newline = &"\n{indent}  {icons.wrap} ") & "\n"
 
-proc editTask(task: var Task) =
-  task.task = "REDACTED"
+# proc editTask(task: var Task) =
+#   task.task = "REDACTED"
 
 template `=~` *(s: string, pattern: Regex2): untyped =
   var matches {.inject.}: RegexMatch2
@@ -113,15 +113,15 @@ proc parseText(t: var Todo) =
 
     # header 1
     elif line =~ re2"^#\s+?(.*)$":
-      t.addStylizedLine(getMatch(matches, line).cyan.bold)
+      t.addStylizedLine($getMatch(matches, line).bb("cyan bold"))
 
     # header 2
     elif line =~ re2"^##\s+?(.*)$":
-      t.addStylizedLine(getMatch(matches, line).green.bold)
+      t.addStylizedLine($getMatch(matches, line).bb("green bold"))
 
     # header 3
     elif line =~ re2"^###\s+?(.*)$":
-      t.addStylizedLine(getMatch(matches, line).yellow.bold)
+      t.addStylizedLine($getMatch(matches, line).bb("yellow bold"))
 
     # ignore comments
     elif line =~ re2"^\s*?<!--(.*)-->\s*?$": discard

@@ -1,22 +1,22 @@
 import std/[math, os, osproc, sequtils,
             strformat, strutils, sugar, tables]
 
-import todo, database, ansi#, config
+import todo, database, bbansi, ansi
 
 proc error(s: string, code: int = 1) =
-  echo "ERROR".red & ": " & s
+  echo "[red]ERROR[/]".bb & ": " & s
   quit code
 
 # TODO: add option to split?
 proc confirm(question: string, postQuestion: string = ""): bool =
-  stdout.write question & " (Y/n) ".yellow
+  stdout.write question & " [yellow](Y/n)[/] ".bb
   if postQuestion != "":
     stdout.write "\n" & postQuestion & "\n"
   while true:
     case readLine(stdin).toLower:
       of "y", "yes": return true
       of "n", "no": return false
-      else: stdout.write "\nplease specify: (y)es/(n)o \n"
+      else: stdout.write "please specify: [yellow](y)es/(n)o[/] ".bb
 
 proc show*(global: bool = false, hide: bool = false, status: bool = false,
            todo: bool = false, workingDirectory: string = "",
@@ -51,7 +51,7 @@ proc show*(global: bool = false, hide: bool = false, status: bool = false,
           else: icons.unchecked
         )
         line.add(" ")
-        line.add(if task.complete: task.task.dim.strike
+        line.add(if task.complete: $(bb"[dim strike]" & task.task)
                  else: task.task
         )
         echo line
@@ -69,11 +69,11 @@ proc clearItems*(global: bool = false, yes: bool = false,
   for p in todoPaths:
     var t = db.get(p)
     for task in t.tasks.filterIt(it.complete):
-      echo task.task.red
+      echo bb("[red]") & task.task
 
     # TODO: use a relativePath for this
     # TODO: actually use yes
-    if confirm(&"remove above completed tasks and overwrite: \n  " & t.path.bold):
+    if confirm($bb(&"remove above completed tasks and overwrite: \n  [b]{t.path}")):
       t.removeComplete()
 
       # TODO: don't add todo to database if it isn't already there...
@@ -84,8 +84,7 @@ proc clearItems*(global: bool = false, yes: bool = false,
 proc edit*(global: bool = false,
       workingDirectory: string = ""
            ) =
-  ## launch *$$EDITOR* with todo files
-  echo workingDirectory
+  ## launch $$EDITOR with todo files
   let cwd = if workingDirectory == "": getCurrentDir() else: workingDirectory
   let (_, dirName) = cwd.splitPath()
   if not existsEnv("EDITOR"): error("$EDITOR is not set")
@@ -115,9 +114,9 @@ proc getCellLen(rows: seq[tuple[path: string, complete: string,
 proc styleRow(row: tuple[path: string, complete: string, incomplete: string],
     cellLens: seq[int]): string =
   @[
-   row.path.alignLeft(cellLens[0]).bold,
-   icons.checked & " " & row.complete.center(cellLens[1]).green,
-   icons.unchecked & " " & row.incomplete.center(cellLens[2]).red,
+   $(bb(row.path.alignLeft(cellLens[0]), "b")),
+   icons.checked & " " & $(bb(row.complete.center(cellLens[1]), "green")),
+   icons.unchecked & " " & $(bb(row.incomplete.center(cellLens[2]), "red"))
     ].join(" " & boxV & " ")
 
 proc list*(absolute: bool = false
@@ -144,7 +143,7 @@ proc list*(absolute: bool = false
       styleRow(row, cellLens)
 
   let header = @[
-      "todo's".center(sum(cellLens) + 10).italic & "",
+      $("[italic]".bb & "todo's".center(sum(cellLens) + 10)) & "",
       boxH.repeat(sum(cellLens) + 10)
     ]
   echo concat(
@@ -174,10 +173,10 @@ workingDirectory: string = ""
   if findExe("grep") == "": error("grep not found")
 
   let cmd = &"grep {args} \"{symbol} TODO\""
-  echo "cmd: " & cmd.bold
+  echo bb(&"cmd: [b]{cmd}")
   let errC = execCmd cmd
   if errC != 0:
-    echo red(&"grep exited with error code {errC}")
+    echo bb(&"[red]grep exited with error code {errC}")
 
 type
   GitFileStatus = object
@@ -218,7 +217,7 @@ proc commit*(yes: bool = false) =
   let (output, code) = execCmdEx("git status --porcelain=v1")
   if code != 0:
     echo (
-      "git had non-zero exit status...\n".red &
+      "[red]git had non-zero exit status...\n".bb &
       "git output:\n" &
       output
     )
