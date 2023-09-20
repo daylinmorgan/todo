@@ -14,7 +14,7 @@ binDir        = "bin"
 requires "nim >= 1.6.10",
          "cligen",
          "regex",
-         "yaml",
+         "yaml >= 2.0.0",
          "https://github.com/daylinmorgan/bbansi#head"
 
 

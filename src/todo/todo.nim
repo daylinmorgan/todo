@@ -41,17 +41,10 @@ proc wasModified*(t: Todo): bool = t.lastWriteTime !=
     t.path.getFileInfo.lastWriteTime
 
 proc status*(t: Todo, p: string): string =
-  let row = (path: t.path,
-          complete: $t.complete,
-          incomplete: $t.incomplete)
-
-  return ("  " & (@[
-      $p.bb("b"),
-      icons.checked & " " & $row.complete.bb("green"),
-      icons.unchecked & " " & $row.incomplete.bb("red"),
-    ]
-    ).join(" | ")
-    )
+  return $(fmt"[b]{p}[/] " &
+          fmt" | {icons.checked} [green]{t.complete}[/] " &
+          fmt" | {icons.unchecked} [red]{$t.incomplete}[/]"
+          ).bb
 
 proc addStylizedLine(t: var Todo, task: var Task): seq[int] =
   if task.complete:

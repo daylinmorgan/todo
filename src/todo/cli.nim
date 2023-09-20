@@ -4,7 +4,7 @@ import std/[math, os, osproc, sequtils,
 import todo, database, bbansi, ansi
 
 proc error(s: string, code: int = 1) =
-  echo "[red]ERROR[/]".bb & ": " & s
+  echo fmt"[red]ERROR[/: {s}".bb
   quit code
 
 # TODO: add option to split?

@@ -2,3 +2,5 @@
 /dist
 
 nim.cfg
+nimble.develop
+nimble.paths
