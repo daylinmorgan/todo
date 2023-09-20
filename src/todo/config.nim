@@ -1,4 +1,3 @@
-{.warning[BareExcept]: off.} # Maybe only needed for nim 1.6.12
 import std/[os]
 import yaml, streams
 
