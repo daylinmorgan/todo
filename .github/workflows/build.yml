@@ -6,4 +6,4 @@ on:
 
 jobs:
   build-artifact:
-    uses: daylinmorgan/actions/.github/workflows/build-nim-forge.yml@main
+    uses: daylinmorgan/actions/.github/workflows/build-nim-forge-atlas.yml@main

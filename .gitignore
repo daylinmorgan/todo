@@ -1,6 +1,6 @@
 /bin
 /dist
 
-nim.cfg
-nimble.develop
-nimble.paths
+# atlas
+*.workspace
+src/nim.cfg
