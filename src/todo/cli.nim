@@ -119,8 +119,7 @@ proc styleRow(row: tuple[path: string, complete: string, incomplete: string],
    icons.unchecked & " " & $(bb(row.incomplete.center(cellLens[2]), "red"))
     ].join(" " & boxV & " ")
 
-proc list*(absolute: bool = false
-           ) =
+proc list*(absolute: bool = false) =
   ## list registered todo's
 
   db.check(reload = true)
@@ -143,7 +142,7 @@ proc list*(absolute: bool = false
       styleRow(row, cellLens)
 
   let header = @[
-      $("[italic]".bb & "todo's".center(sum(cellLens) + 10)) & "",
+      $("[italic]" & "todo's".center(sum(cellLens) + 10)).bb & "",
       boxH.repeat(sum(cellLens) + 10)
     ]
   echo concat(
