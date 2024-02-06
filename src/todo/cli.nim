@@ -163,7 +163,7 @@ proc database*(add: seq[string] = @[], del: seq[string] = @[]) =
   db.save()
 
 const grepArgs = "-rni"
-const nimgrepArgs = "-i"
+const nimgrepArgs = "-ri"
 
 proc pickGrepExe(): tuple[exe: string, args: string] =
   result.exe = findExe("nimgrep")
@@ -176,11 +176,11 @@ proc pickGrepExe(): tuple[exe: string, args: string] =
     else: grepArgs
 
 proc grep*(symbol: string = "#", args: string = "",
-    workingDirectory: string = "") =
+           workingDirectory: string = "", path: seq[string]) =
   ## run (nim)grep for TODO comments
 
   let (grepExe, args) = pickGrepExe()
-  let cmd = &"{grepExe} {args} \"{symbol} TODO\""
+  let cmd = &"{grepExe} {args} \"{symbol} TODO\" " & path.join(" ")
   echo bb(&"cmd: [b]{cmd}")
   let errC = execCmd cmd
   if errC != 0:
