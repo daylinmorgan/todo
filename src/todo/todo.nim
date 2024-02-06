@@ -44,7 +44,7 @@ proc status*(t: Todo, p: string): string =
   return $(fmt"[b]{p}[/] " &
           fmt" | {icons.checked} [green]{t.complete}[/] " &
           fmt" | {icons.unchecked} [red]{$t.incomplete}[/]"
-          ).bb
+    ).bb
 
 proc addStylizedLine(t: var Todo, task: var Task): seq[int] =
   if task.complete:

@@ -43,7 +43,7 @@ proc del*(db: var Database, p: string) =
   if db.todos.contains(pAbs):
     db.todos.del pAbs
   else:
-    echo p," not found in databse"
+    echo p, " not found in databse"
 
 
 proc get*(db: Database, p: string): Todo =
