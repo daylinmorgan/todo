@@ -2,6 +2,8 @@
 
 <!-- comments will hidden from `todo show` -->
 
+- [x] try nimgrep before grep
+
 ## Bugs
 
 - [ ] exit gracefully instead of attempting to access index that doesn't exist

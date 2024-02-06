@@ -162,14 +162,25 @@ proc database*(add: seq[string] = @[], del: seq[string] = @[]) =
   echo &"tracking {len(db.todos)} todo's"
   db.save()
 
-proc grep*(symbol: string = "#", args: string = "-rni",
-workingDirectory: string = ""
-           ) =
-  ## run grep for TODO comments
+const grepArgs = "-rni"
+const nimgrepArgs = "-i"
 
-  if findExe("grep") == "": error("grep not found")
+proc pickGrepExe(): tuple[exe: string, args: string] =
+  result.exe = findExe("nimgrep")
+  if result.exe == "":
+    result.exe = findExe("grep")
+  if result.exe == "":
+    error "nimgrep or grep needs to be on the $PATH"
+  result.args =
+    if result.exe.endswith("nimgrep"): nimgrepArgs
+    else: grepArgs
 
-  let cmd = &"grep {args} \"{symbol} TODO\""
+proc grep*(symbol: string = "#", args: string = "",
+    workingDirectory: string = "") =
+  ## run (nim)grep for TODO comments
+
+  let (grepExe, args) = pickGrepExe()
+  let cmd = &"{grepExe} {args} \"{symbol} TODO\""
   echo bb(&"cmd: [b]{cmd}")
   let errC = execCmd cmd
   if errC != 0:
