@@ -43,7 +43,7 @@ proc del*(db: var Database, p: string) =
   if db.todos.contains(pAbs):
     db.todos.del pAbs
   else:
-    echo "p not found in databse"
+    echo p," not found in databse"
 
 
 proc get*(db: Database, p: string): Todo =
@@ -78,14 +78,13 @@ proc check*(db: var Database, reload: bool = false) =
     db.save
 
 
-proc load*(): Database =
+proc load*(db: var Database) =
   let dbPath = getDataDir() / "todo" / "todos.json"
-  if not fileExists(dbPath):
-    return Database(path: dbPath)
-  else:
-    result.path = dbPath
-    result.todos = parseJson(readFile(dbPath)).to(Table[string, Todo])
+  db.path = dbPath
 
-  result.check
+  if fileExists(dbPath):
+    db.todos = parseJson(readFile(dbPath)).to(Table[string, Todo])
+    db.check
 
-var db*: Database = load()
+var db* = Database()
+db.load()
