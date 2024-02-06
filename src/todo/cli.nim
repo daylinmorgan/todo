@@ -38,8 +38,6 @@ proc show*(global: bool = false, hide: bool = false, status: bool = false,
       t.stylizeTodo(hide)
       echo t.status(p).centerText
     else:
-      # TODO: make generalized stylize todo that wraps
-      # and styles seperate from addstylizedLine
       let tasks = (
         if hide: t.tasks.filterIt(not it.complete)
         else: t.tasks
@@ -51,7 +49,7 @@ proc show*(global: bool = false, hide: bool = false, status: bool = false,
           else: icons.unchecked
         )
         line.add(" ")
-        line.add(if task.complete: $(bb"[dim strike]" & task.task)
+        line.add(if task.complete: $(task.task.bb("dim strike"))
                  else: task.task
         )
         echo line
