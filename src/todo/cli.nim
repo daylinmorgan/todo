@@ -4,7 +4,7 @@ import std/[math, os, osproc, sequtils,
 import todo, database, bbansi, ansi
 
 proc error(s: string, code: int = 1) =
-  echo fmt"[red]ERROR[/: {s}".bb
+  echo fmt"[red]ERROR[/]: {s}".bb
   quit code
 
 # TODO: add option to split?
@@ -27,7 +27,8 @@ proc show*(global: bool = false, hide: bool = false, status: bool = false,
 
   let root = if workingDirectory == "": getCurrentDir() else: workingDirectory
   let todoPaths = collectFiles(root, global, exit = true, quiet = quiet)
-  if status and todo: error("-s/--status and -t/--todo are mutually exclusive")
+  if status and todo:
+    error "-s/--status and -t/--todo are mutually exclusive"
 
   for p in todoPaths:
     let t = db.get(p)

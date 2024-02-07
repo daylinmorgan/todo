@@ -31,7 +31,7 @@ runnableExamples("-r:off"):
     var e = next(p)
     case e.kind
     of cfgEof: break
-    of cfgSectionStart:   ## a `[section]` has been parsed
+    of cfgSectionStart: ## a `[section]` has been parsed
       echo "new section: " & e.section
     of cfgKeyValuePair:
       echo "key-value-pair: " & e.key & ": " & e.value
@@ -62,7 +62,7 @@ runnableExamples("-r:off"):
 
 runnableExamples:
   var dict = newConfig()
-  dict.setSectionKey("","charset", "utf-8")
+  dict.setSectionKey("", "charset", "utf-8")
   dict.setSectionKey("Package", "name", "hello")
   dict.setSectionKey("Package", "--threads", "on")
   dict.setSectionKey("Author", "name", "nim-lang")
@@ -83,11 +83,11 @@ website=nim-lang.org
 
 runnableExamples("-r:off"):
   let dict = loadConfig("config.ini")
-  let charset = dict.getSectionValue("","charset")
-  let threads = dict.getSectionValue("Package","--threads")
-  let pname = dict.getSectionValue("Package","name")
-  let name = dict.getSectionValue("Author","name")
-  let website = dict.getSectionValue("Author","website")
+  let charset = dict.getSectionValue("", "charset")
+  let threads = dict.getSectionValue("Package", "--threads")
+  let pname = dict.getSectionValue("Package", "name")
+  let name = dict.getSectionValue("Author", "name")
+  let website = dict.getSectionValue("Author", "website")
   echo pname & "\n" & name & "\n" & website
 
 ##[
@@ -163,7 +163,7 @@ runnableExamples:
   assert dict.getSectionValue(section2, "can use the API to get converted values directly") == "true"
 
   let section3 = "Seletion A"
-  assert dict.getSectionValue(section3, 
+  assert dict.getSectionValue(section3,
     "space around section name will be ignored", "not an empty value") == ""
 
   let section4 = "Sections Can Be Indented"
@@ -219,7 +219,8 @@ type
 # implementation
 
 const
-  SymChars = {'a'..'z', 'A'..'Z', '0'..'9', '_', ' ', '\x80'..'\xFF', '.', '/', '\\', '-', ','}
+  SymChars = {'a'..'z', 'A'..'Z', '0'..'9', '_', ' ', '\x80'..'\xFF', '.', '/',
+      '\\', '-', ','}
 
 proc rawGetTok(c: var CfgParser, tok: var Token) {.gcsafe.}
 
@@ -606,7 +607,7 @@ proc writeConfig*(dict: Config, stream: Stream) =
 
 proc `$`*(dict: Config): string =
   ## Writes the contents of the table to string.
-  ## 
+  ##
   ## .. note:: Comment statement will be ignored.
   let stream = newStringStream()
   defer: stream.close()
@@ -615,14 +616,15 @@ proc `$`*(dict: Config): string =
 
 proc writeConfig*(dict: Config, filename: string) =
   ## Writes the contents of the table to the specified configuration file.
-  ## 
+  ##
   ## .. note:: Comment statement will be ignored.
   let file = open(filename, fmWrite)
   defer: file.close()
   let fileStream = newFileStream(file)
   dict.writeConfig(fileStream)
 
-proc getSectionValue*(dict: Config, section, key: string, defaultVal = ""): string =
+proc getSectionValue*(dict: Config, section, key: string,
+    defaultVal = ""): string =
   ## Gets the key value of the specified Section.
   ## Returns the specified default value if the specified key does not exist.
   if dict.hasKey(section):
