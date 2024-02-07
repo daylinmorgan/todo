@@ -3,6 +3,7 @@
 <!-- comments will hidden from `todo show` -->
 
 - [x] try nimgrep before grep
+- [ ] combine env variable and file config
 
 ## Bugs
 
@@ -10,12 +11,9 @@
 
 ## Stable
 
-- [x] switch advance config pattern to `yaml` file
 - [-] commit helper -> `todo commit`
 - [x] add a quiet flag to show, so it doesn't suggest todo edit
 - [x] fully implement working directory pattern
-- [ ] minimal documentation with `nimib` or `mkdocs`
-  - [ ] and vhs tapes to generate nice gifs
 
 ## Future improvements
 
