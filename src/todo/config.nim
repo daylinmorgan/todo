@@ -26,8 +26,6 @@ proc loadTodoCfg*(): TodoConfig =
     result.caseSensitive = parseBool(ignoreCaseSet)
   
   result.defaultCmd = dict.getSectionValue("", "defaultCmd", result.defaultCmd)
-  
-  echo result
 
 let cfg* = loadTodoCfg()
 
