@@ -6,7 +6,7 @@ description   = "simple markdown-based todo app"
 license       = "MIT"
 srcDir        = "src"
 bin           = @["todo"]
-binDir        = "bin"
+# binDir        = "bin"
 
 
 # Dependencies
