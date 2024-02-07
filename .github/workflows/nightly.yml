@@ -17,7 +17,9 @@ jobs:
   build-artifacts:
     needs: check-commits
     if: ${{ needs.check-commits.outputs.quit != 'true' }}
-    uses: daylinmorgan/actions/.github/workflows/build-nim-forge-atlas.yml@main
+    uses: daylinmorgan/actions/.github/workflows/build-nim-binaries.yml@main
+    with:
+      module: todo
 
   generate-release:
     needs: build-artifacts

@@ -5,5 +5,8 @@ on:
   workflow_call:
 
 jobs:
-  build-artifact:
-    uses: daylinmorgan/actions/.github/workflows/build-nim-forge-atlas.yml@main
+  build-artifacts:
+    uses: daylinmorgan/actions/.github/workflows/build-nim-binaries.yml@main
+    with:
+      module: todo
+
