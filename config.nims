@@ -1,5 +1,8 @@
 import std/[strformat, strutils]
 
+# https://github.com/nim-lang/Nim/issues/23289
+patchFile("stdlib", "parsecfg", "src/todo/private/parsecfg")
+
 task build, "build":
   selfExec "c -d:release -o:bin/todo src/todo.nim"
 

@@ -151,6 +151,7 @@ proc readFiles*(fileNames: seq[string]): Table[string, string] =
   for fileName in fileNames:
     result[fileName] = fileName.readFile
 
+# combine this option with the config file?
 let fileNamePatterns* = os.getEnv("TODO_PATTERNS", "todo.md:.todo.md").split(":")
 
 # TODO: deduplicate global option as it's redundant with --working-directory

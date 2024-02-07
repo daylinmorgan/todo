@@ -1,40 +1,36 @@
-import std/[os]
-import yaml, streams
+import std/[os, parsecfg, parseutils, strutils, sugar]
 
 type
-  TodoConfig* = object
-    patterns*{.defaultVal: @["todo.md", ".todo.md"].}: seq[string]
-    `case-sensitive`* {.defaultVal: false.}: bool
-    `default-cmd`* {.defaultVal: "show".}: string
+  TodoConfig = object
+    patterns*:seq[string] = @["todo.md",".todo.md"]
+    caseSensitive*:bool = true
+    defaultCmd*: string = "show"
 
-const defaultCfg = """
-patterns:
-  - todo.md
-  - .todo.md
-default-cmd: show
-case-sensitive: false
-"""
+proc loadTodoCfg*(): TodoConfig = 
+  result = TodoConfig()
+  let cfgFile = getConfigDir() / "todo" / "todo.cfg"
+  if not fileExists cfgFile: return
 
-proc pickConfigFile(): string =
-  let configDir = getConfigDir() / "todo"
-  if not dirExists configDir:
-    return "config.yml"
+  let dict = loadConfig(cfgFile)
+  let patterns = dict.getSectionValue("","patterns")
+  if patterns.len > 0 and (',' in patterns or '\n' in patterns):
+    let splitChar = 
+      if "," in patterns: ',' 
+      else: '\n'
+    result.patterns = collect(for i in patterns.split(splitChar): i.strip())
+  elif patterns.len > 0:
+    result.patterns = @[patterns]
+ 
+  let ignoreCaseSet = dict.getSectionValue("", "caseSensitive")
+  if ignoreCaseSet.len > 0:
+    result.caseSensitive = parseBool(ignoreCaseSet)
+  
+  result.defaultCmd = dict.getSectionValue("", "defaultCmd", result.defaultCmd)
+  
+  echo result
 
-  if fileExists "config.yml":
-    return "config.yml"
-  elif fileExists "config.yaml":
-    return "config.yaml"
-  else:
-    return "config.yml"
+let cfg* = loadTodoCfg()
 
-proc loadConfig*(): TodoConfig =
 
-  let configFile = pickConfigFile()
-  if fileExists(configFile):
-    let s = newFileStream(configFile)
-    load(s, result)
-    s.close()
-  else:
-    load(defaultCfg, result)
 
-let cfg* = loadConfig()
+

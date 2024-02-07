@@ -6,7 +6,7 @@ when isMainModule:
 
   proc mergeParams(cmdNames: seq[string]; cmdLine = commandLineParams()): seq[string] =
     if cmdNames == @["multi"] and cmdLine.len == 0:
-      return cfg.`default-cmd`.parseCmdLine
+      return cfg.defaultCmd.parseCmdLine
     else: return cmdLine
 
   const
