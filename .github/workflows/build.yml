@@ -149,19 +149,23 @@ jobs:
         if: matrix.target.archive_format == 'zip'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.zip
+          # name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.zip
+          name: artifacts
           path: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.zip
 
       - name: Upload the Nim Binaries (.tar.gz)
         if: matrix.target.archive_format == 'tgz'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.tar.gz
+          name: artifacts
+          # name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.tar.gz
           path: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.tar.gz
 
   create-macos-universal-binary:
     name: Create a Universal macOS binary
     needs: [build]
+    defaults:
+      shell: bash
     runs-on: macos-11
     steps:
       - name: Download artifacts
@@ -170,31 +174,27 @@ jobs:
           pattern: ${{ env.APP }}-macos-*.zip
 
       - name: Extract binaries for amd64-macos
-        shell: bash
         run: |
           7z x ${APP}-macos-amd64.zip/${APP}-macos-amd64.zip
           mv ${APP} ${APP}-amd64
 
       - name: Extract binaries for arm64-macos
-        shell: bash
         run: |
           7z x ${APP}-macos-arm64.zip/${APP}-macos-arm64.zip
           mv ${APP} ${APP}-arm64
 
       - name: Build Universal binary
-        shell: bash
         run: |
           lipo -create -output ${APP} ${APP}-amd64 ${APP}-arm64
 
-      - name: Compress the Nim Language Server binaries
-        shell: bash
+      - name: Compress the Nim Binaries
         run: |
           7z a -tzip ${APP}-macos-universal.zip ${APP}
 
-      - name: Upload the Nim Language Server Binaries
+      - name: Upload the Nim Binaries
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP }}-macos-universal.zip
+          name: artifacts
           path: ${{ env.APP }}-macos-universal.zip
   
   # create-github-release:
