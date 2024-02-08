@@ -21,42 +21,4 @@ jobs:
 
   create-release:
     needs: build-artifacts
-    runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts/
-
-      - run: tree artifacts
-
-      - name: Remove Old Nightly Release
-        run: |
-          gh release delete nightly --yes || true
-          git tag -d nightly || true
-          git push origin :nightly || true
-
-      - name: Generate New Nightly Release
-        run: |
-          last_tag=$(git describe --tags --abbrev=0 --match "v*.*")
-          commits=$(git log $last_tag..HEAD --format="%h %s")
-          cat <<EOF > notes.md
-          $last_tag..nightly
-          $(printf "%s" "$commits" | grep -c "^") commits since last release
-
-          ---
-
-          $commits
-          EOF
-          gh release create nightly \
-            --title "Nightly Release (Pre-release)" \
-            --prerelease \
-            -F notes.md \
-          ./artifacts/**/*
-
+    uses: daylinmorgan/actions/.github/workflows/nightly.yml@main
