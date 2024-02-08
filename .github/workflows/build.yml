@@ -149,16 +149,14 @@ jobs:
         if: matrix.target.archive_format == 'zip'
         uses: actions/upload-artifact@v4
         with:
-          # name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.zip
-          name: artifacts
+          name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.zip
           path: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.zip
 
       - name: Upload the Nim Binaries (.tar.gz)
         if: matrix.target.archive_format == 'tgz'
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
-          # name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.tar.gz
+          name: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.tar.gz
           path: ${{ env.APP }}-${{ matrix.target.name }}-${{ matrix.target.cpu }}.tar.gz
 
   create-macos-universal-binary:
@@ -195,7 +193,7 @@ jobs:
       - name: Upload the Nim Binaries
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: ${{ env.APP }}-macos-universal.zip
           path: ${{ env.APP }}-macos-universal.zip
   
   # create-github-release:
