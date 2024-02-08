@@ -79,7 +79,7 @@ jobs:
       triple: ${{ matrix.target.triple }}
       name: ${{ matrix.target.name }}
       cpu: ${{ matrix.target.cpu }}
-      name_cpu: ${{ matrix.target.name_cpu }}
+      nim_cpu: ${{ matrix.target.nim_cpu }}
       nimble_cpu: ${{ matrix.target.nimble_cpu }}
       archive_format: ${{ matrix.target.archive_format }}
       builder: ${{ matrix.builder }}
