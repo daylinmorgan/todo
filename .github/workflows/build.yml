@@ -104,6 +104,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: jiro4989/setup-nim-action@v1
+        with:
+          nim-version: '2.x'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup Nimble
         uses: nim-lang/nimble/.github/actions/install_nimble@master
         with:
@@ -117,14 +122,14 @@ jobs:
           path: ~/.nimble/
           key: ${{ matrix.target.os }}-${{ env.cache_nonce }}
 
-      - name: Fix Windows Nimble SSL error
-        run: |
-          curl -fO https://curl.se/ca/cacert.pem
-          mkdir -vp ~/.nimble/bin/
-          install cacert.pem ~/.nimble/bin
-          ls ~/.nimble/bin
-        if: runner.os == 'Windows'
-        shell: bash
+      # - name: Fix Windows Nimble SSL error
+      #   run: |
+      #     curl -fO https://curl.se/ca/cacert.pem
+      #     mkdir -vp ~/.nimble/bin/
+      #     install cacert.pem ~/.nimble/bin
+      #     ls ~/.nimble/bin
+      #   if: runner.os == 'Windows'
+      #   shell: bash
 
       - name: Build ${{ inputs.module }}
         run: |
