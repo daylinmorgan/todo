@@ -117,6 +117,15 @@ jobs:
           path: ~/.nimble/
           key: ${{ matrix.target.os }}-${{ env.cache_nonce }}
 
+      - name: Fix Windows Nimble SSL error
+        run: |
+          curl -fO https://curl.se/ca/cacert.pem
+          mkdir -vp ~/.nimble/bin/
+          install cacert.pem ~/.nimble/bin
+          ls ~/.nimble/bin
+        if: runner.os == 'Windows'
+        shell: bash
+
       - name: Build ${{ inputs.module }}
         run: |
           echo i386.linux.gcc.exe = \"i686-linux-gnu-gcc\" >> nim.cfg
@@ -127,9 +136,9 @@ jobs:
             echo "--passC:\"-target arm64-apple-macos11\"" >> nim.cfg
             echo "--passL:\"-target arm64-apple-macos11\"" >> nim.cfg
             cat nim.cfg
-            nimble build -d:release --cpu:arm64 --os:macosx
+            nimble build --debug -d:release --cpu:arm64 --os:macosx
           else
-            nimble build -d:release --cpu:${{ matrix.target.nim_cpu }}
+            nimble build --debug -d:release --cpu:${{ matrix.target.nim_cpu }}
           fi
 
       - name: Compress the Binaries
