@@ -1,14 +1,18 @@
-import std/[enumerate, os, sequtils, strformat, strutils, tables, times,
-    sugar, wordwrap]
-
-import regex
-import bbansi
-import ansi
+import std/[
+  enumerate, os, sequtils, strformat,
+  strutils, tables, times,
+  sugar, wordwrap
+]
+import regex, hwylterm
+import ./[ansi]
 
 type
+  TaskStatus = enum
+    Complete, Incomplete, InProgress
   Task* = object
+    status: TaskStatus
     complete*: bool
-    task*: string
+    text*: string
     indent*: string
     line*: int
 
@@ -17,17 +21,35 @@ type
     path*: string
     raw*: string
     stylized: string
-    incomplete*: int
-    complete*: int
     tasks*: seq[Task]
     lastWriteTime*: Time
     hideLines: seq[int]
+    # TODO: implement hideLines as a seq of slices?
 
+proc incomplete*(t: Todo): int = t.tasks.filterIt(it.status == Incomplete).len
+proc complete*(t: Todo): int   = t.tasks.filterIt(it.status == Complete).len
+proc inProgress*(t: Todo): int = t.tasks.filterIt(it.status == InProgress).len
+
+proc addLine(s: var string, s2: string) =
+  s.add s2
+  s.add "\n"
+
+let useNerdFonts = getEnv("TODO_NERDFONTS_DISABLE") == ""
+let taskIcons: array[TaskStatus, string] =
+  if not useNerdFonts: ["[✓]","[ ]","[-]"]
+  else: ["","","󰡖"]
+let wrapIcon =
+  if not useNerdFonts: "->"
+  else: "↳"
 
 let icons* = (
-  if os.getEnv("TODO_NERDFONTS_DISABLE") != "": (unchecked: "[ ]",
-      checked: "[✓]", wrap: "->")
-  else: (unchecked: "", checked: "", wrap: "↳")
+  if os.getEnv("TODO_NERDFONTS_DISABLE") != "": (
+    unchecked: "[ ]", checked: "[✓]", wrap: "->", inprogress: "[-]" )
+  else: (unchecked: "",
+         checked: "",
+         wrap: "↳",
+         inprogress: "󰡖"
+        )
 )
 
 proc removeLines*(s: string, idxs: seq[int]): string =
@@ -40,47 +62,50 @@ proc removeLines*(s: string, idxs: seq[int]): string =
 proc wasModified*(t: Todo): bool = t.lastWriteTime !=
     t.path.getFileInfo.lastWriteTime
 
-proc status*(t: Todo, p: string): string =
-  return $(fmt"[b]{p}[/] " &
-          fmt" | {icons.checked} [green]{t.complete}[/] " &
+proc status*(t: Todo): string =
+  let 
+    parent = lastPathPart(parentDir(t.path))
+    file = extractFilename(t.path)
+    path = parent & "/" & file
+  return $(fmt"[b]{path}[/] " &
+          fmt" | {icons.checked} [green]{t.complete}[/]" &
           fmt" | {icons.unchecked} [red]{$t.incomplete}[/]"
     ).bb
 
-proc addStylizedLine(t: var Todo, task: var Task): seq[int] =
-  if task.complete:
-    let stylizedLine = task.indent & icons.checked & " " & task.task.wrapWords(
+proc stylize(task: Task): string =
+  result.add task.indent
+  result.add taskIcons[task.status]
+  result.add " "
+  case task.status:
+  of Complete:
+    result.add task.text.wrapWords(
         maxLineWidth = maxScreenWidth,
-        newline = &"\n{task.indent}  {icons.wrap} ").split("\n").mapIt(
-        $it.bb("faint strike")).join("\n")
-
-    let hideLines = collect:
-      for i in 1..len(stylizedLine.splitLines()):
-        i + len(t.stylized.splitLines()) - 2
-
-    t.stylized = t.stylized & stylizedLine & "\n"
-    return hideLines
-  else:
-    let stylizedLine = task.indent & icons.unchecked & " " &
-        task.task.wrapWords(maxLineWidth = maxScreenWidth,
-        newline = &"\n{task.indent}  {icons.wrap} ")
-
-    t.stylized = t.stylized & stylizedLine & "\n"
+        newline = &"\n{task.indent}  {wrapIcon} "
+    ).split("\n").mapIt($it.bb("faint strike")).join("\n")
+  of Incomplete, InProgress:
+    result.add task.text.wrapWords(
+      maxLineWidth = maxScreenWidth,
+      newline = &"\n{task.indent}  {wrapIcon} "
+    )
 
 proc addStylizedLine(t: var Todo, s: string, indent: string = "") =
   t.stylized = t.stylized & s.wrapWords(maxLineWidth = maxScreenWidth,
       newline = &"\n{indent}  {icons.wrap} ") & "\n"
 
-# proc editTask(task: var Task) =
-#   task.task = "REDACTED"
-
 template `=~` *(s: string, pattern: Regex2): untyped =
   var matches {.inject.}: RegexMatch2
   match(s, pattern, matches)
 
-proc digestTaskMatch(m: RegexMatch2, line: string): tuple[task,
-    indent: string] =
-  result.task = line[m.group("task")]
-  result.indent = line[m.group("indent")]
+proc newTaskFromMatch(
+  matches: RegexMatch2,
+  line: string,
+  i: int,
+  status: TaskStatus
+): Task =
+  result.text = line[matches.group("task")]
+  result.status = status
+  result.indent = line[matches.group("indent")]
+  result.line = i
 
 template getMatch(m: RegexMatch2, l: string): string =
   l[m.group(0)]
@@ -92,17 +117,27 @@ proc parseText(t: var Todo) =
 
     # completed task
     if line =~ re2"^(?P<indent>\s*?)\-\s+\[\s*?[xX]\s*?\]\s(?P<task>.*)$":
-      let (task, indent) = digestTaskMatch(matches, line)
-      t.tasks.add Task(complete: true, task: task, indent: indent, line: i)
-      t.complete.inc
-      t.hideLines = t.hideLines.concat(t.addStylizedLine(t.tasks[^1]))
+      let task = newTaskFromMatch(matches, line, i, Complete)
+      t.tasks.add task
+      let
+        lines = task.stylize()
+        hideLines = collect:
+          for i in 1..len(lines.splitLines()):
+            i + len(t.stylized.splitLines()) - 2
+      t.addStylizedLine lines
+      t.hideLines.add hideLines
 
     # incomplete task
     elif line =~ re2"^(?P<indent>\s*?)\-\s+\[\s+\]\s(?P<task>.*)$":
-      let (task, indent) = digestTaskMatch(matches, line)
-      t.tasks.add Task(complete: false, task: task, indent: indent, line: i)
-      t.incomplete.inc
-      discard t.addStylizedLine(t.tasks[^1])
+      let task = newTaskFromMatch(matches, line, i, Incomplete)
+      t.tasks.add task
+      t.addStylizedLine task.stylize()
+
+    # inprogress task
+    elif line =~ re2"^(?P<indent>\s*?)\-\s+\[\s*?\-\s*?\]\s(?P<task>.*)$":
+      let task = newTaskFromMatch(matches, line, i, InProgress)
+      t.tasks.add task
+      t.addStylizedLine task.stylize()
 
     # header 1
     elif line =~ re2"^#\s+?(.*)$":
@@ -159,10 +194,9 @@ proc collectFiles*(root: string, global: bool, exit: bool = false,
     quiet: bool = false): seq[string] =
   var fileName: string
   for file in fileNamePatterns:
-    if global:
-      fileName = getEnv("HOME") / file
-    else:
-      fileName = root / file
+    filename =
+      if global: getEnv("HOME") / file
+      else: root / file
 
     if fileExists(fileName):
       result.add fileName
@@ -175,11 +209,10 @@ proc collectFiles*(root: string, global: bool, exit: bool = false,
 
 
 proc stylizeTodo*(t: Todo, hide: bool) =
-  if hide:
-    echo t.stylized.removeLines(t.hideLines).boxify
-  else:
-    echo t.stylized.boxify
-
+  let text = 
+    if hide: t.stylized.removeLines(t.hideLines)
+    else: t.stylized
+  echo boxify(text)
 
 const todo_template* = """# $1 todo's
 

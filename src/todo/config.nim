@@ -1,9 +1,8 @@
-import std/[os, parsecfg,
-            sequtils, sets,
-    strutils, sugar, tables
+import std/[
+  os, parsecfg, sequtils,
+  sets, strutils, sugar, tables
 ]
-
-import bbansi
+import hwylterm
 
 type
   TodoConfig = object

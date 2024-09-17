@@ -6,12 +6,13 @@ proc getDataDir*(): string =
   ## Returns the data directory of the current user for applications.
   # follows std/os.getCacheDir
   # which in turn follows https://crates.io/crates/platform-dirs
-  when defined(windows):
-    result = getEnv("LOCALAPPDATA")
-  elif defined(osx):
-    result = getEnv("XDG_DATA_HOME", getEnv("HOME") / "Library/Application Support")
-  else:
-    result = getEnv("XDG_DATA_HOME", getEnv("HOME") / ".local/share")
+  result =
+    when defined(windows):
+      getEnv("LOCALAPPDATA")
+    elif defined(osx):
+      getEnv("XDG_DATA_HOME", getEnv("HOME") / "Library/Application Support")
+    else:
+      getEnv("XDG_DATA_HOME", getEnv("HOME") / ".local/share")
 
   result.normalizePathEnd(false)
 
@@ -21,8 +22,7 @@ type
     todos*: Table[string, Todo]
 
 proc todoFileInfo(p: string): (string, Time) =
-  (p.absolutePath,
-   getFileInfo(p.absolutePath).lastWriteTime)
+  (p.absolutePath, getFileInfo(p.absolutePath).lastWriteTime)
 
 proc add*(db: var Database, p: string) =
   let (pAbs, _) = todoFileInfo(p)

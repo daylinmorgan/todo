@@ -12,6 +12,7 @@ const
 
 let maxScreenWidth* = min(88, terminalWidth()) - 8
 
+# TODO: add escapeAnsi to Hwylterm...sans regex
 proc escapeAnsi*(s: string): string =
   const reAnsiCodes = re2"""(?x)
   \x1B  # ESC
@@ -26,10 +27,6 @@ proc escapeAnsi*(s: string): string =
   """
 
   s.replace(reAnsiCodes, "")
-
-proc runeOffset(s: string): int =
-  let bigRunes = s.toRunes().mapIt(it.size()).filterIt(it > 3)
-  return bigRunes.sum() - len(bigRunes)*3
 
 proc maxWidth(s: string): int = s.splitLines.mapIt(it.escapeAnsi.runeLen).max
 
@@ -47,11 +44,8 @@ proc boxify*(s: string): string =
   rows.add boxTL & boxH.repeat(columns+2) & boxTR
 
   for line in s.splitLines:
-    rows.add(
-      boxV & " " & line.alignLeft(
-        columns + line.len - line.escapeAnsi.len - line.runeOffset,
-       ' '.Rune) & " " & boxV)
+    let alignedLine = unicode.alignLeft(line, columns + line.len - line.escapeAnsi.len)
+    rows.add(boxV & " " & alignedLine & " " & boxV)
 
   rows.add boxBL & boxH.repeat(columns+2) & boxBR
-
   return rows.join("\n").centerText

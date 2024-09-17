@@ -11,10 +11,10 @@ bin           = @["todo"]
 
 # Dependencies
 
-requires "nim >= 1.6.10",
-         "cligen",
-         "regex",
-         "https://github.com/daylinmorgan/bbansi#head"
+requires "nim >= 2.0.8"
+requires "cligen"
+requires "regex"
+requires "https://github.com/daylinmorgan/hwylterm#head"
 
 
 

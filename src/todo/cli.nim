@@ -1,7 +1,9 @@
-import std/[math, os, osproc, sequtils,
-            strformat, strutils, sugar, tables]
-
-import todo, database, bbansi, ansi
+import std/[
+  math, os, osproc, sequtils,
+  strformat, strutils, sugar, tables
+]
+import hwylterm
+import ./[todo, database, ansi]
 
 proc error(s: string, code: int = 1) =
   echo fmt"[red]ERROR[/]: {s}".bb
@@ -18,9 +20,14 @@ proc confirm(question: string, postQuestion: string = ""): bool =
       of "n", "no": return false
       else: stdout.write "please specify: [yellow](y)es/(n)o[/] ".bb
 
-proc show*(global: bool = false, hide: bool = false, status: bool = false,
-           todo: bool = false, workingDirectory: string = "",
-               quiet: bool = false) =
+proc show*(
+  global: bool = false,
+  hide: bool = false,
+  status: bool = false,
+  todo: bool = false,
+  workingDirectory: string = "",
+  quiet: bool = false
+) =
   ## show the todo's (default cmd)
   ##
   ## *NOTE*: --status and --todo are mutually exclusive
@@ -34,10 +41,10 @@ proc show*(global: bool = false, hide: bool = false, status: bool = false,
     let t = db.get(p)
 
     if status:
-      echo t.status(p)
+      echo t.status()
     elif not todo:
       t.stylizeTodo(hide)
-      echo t.status(p).centerText
+      echo t.status().centerText
     else:
       let tasks = (
         if hide: t.tasks.filterIt(not it.complete)
@@ -49,12 +56,12 @@ proc show*(global: bool = false, hide: bool = false, status: bool = false,
           if task.complete: icons.checked
           else: icons.unchecked
         )
-        line.add(" ")
-        line.add(if task.complete: $(task.task.bb("dim strike"))
-                 else: task.task
+        line.add " "
+        line.add(
+          if task.complete: $(task.text.bb("faint strike"))
+          else: task.text
         )
         echo line
-
 
 proc clearItems*(global: bool = false, yes: bool = false,
   workingDirectory: string = "") =
@@ -68,7 +75,7 @@ proc clearItems*(global: bool = false, yes: bool = false,
   for p in todoPaths:
     var t = db.get(p)
     for task in t.tasks.filterIt(it.complete):
-      echo bb("[red]") & task.task
+      echo bb("[red]") & task.text
 
     # TODO: use a relativePath for this
     # TODO: actually use yes

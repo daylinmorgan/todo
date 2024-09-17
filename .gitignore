@@ -1,6 +1,12 @@
 /bin
 /dist
 
+nimble.paths
+
 # atlas
 *.workspace
 src/nim.cfg
+nimble.develop
+
+# nimble
+nimbledeps

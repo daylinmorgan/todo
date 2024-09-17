@@ -4,6 +4,9 @@ import std/[strformat, strutils]
 patchFile("stdlib", "parsecfg", "src/todo/private/parsecfg")
 
 task build, "build":
+  selfExec "c -o:bin/todo src/todo.nim"
+
+task buildRelease, "buildRelease":
   selfExec "c -d:release -o:bin/todo src/todo.nim"
 
 task release, "build release assets":
@@ -13,9 +16,14 @@ task release, "build release assets":
 task bundle, "package build assets":
   withDir "dist":
     for dir in listDirs("."):
-      let cmd = if "windows" in dir:
-        &"zip -qr {dir}.zip {dir}"
-      else: 
-        &"tar czf {dir}.tar.gz {dir}"
+      let cmd =
+        if "windows" in dir: &"zip -qr {dir}.zip {dir}"
+        else: &"tar czf {dir}.tar.gz {dir}"
       cpFile("../README.md", &"{dir}/README.md")
       exec cmd
+
+# begin Nimble config (version 2)
+--noNimblePath
+when withDir(thisDir(), system.fileExists("nimble.paths")):
+  include "nimble.paths"
+# end Nimble config

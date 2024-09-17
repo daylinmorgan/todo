@@ -1,0 +1,48 @@
+{
+  "version": 2,
+  "packages": {
+    "cligen": {
+      "version": "1.7.3",
+      "vcsRevision": "0e7b3b3a1fa77c448d3681c5fdf85197844cb7e4",
+      "url": "https://github.com/c-blake/cligen.git",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "5a082835594887c0fdaea17dbfd2d3a2e744a2a9"
+      }
+    },
+    "hwylterm": {
+      "version": "0.1.0",
+      "vcsRevision": "d6e831367ca3b71ba5b0ead73230f94f3ae9f609",
+      "url": "https://github.com/daylinmorgan/hwylterm",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "a37d975d442a4c44125692d2261f4fe203a31a35"
+      }
+    },
+    "unicodedb": {
+      "version": "0.12.0",
+      "vcsRevision": "b055310c08db8f879057b4fec15c8301ee93bb2a",
+      "url": "https://github.com/nitely/nim-unicodedb",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "4452416471e2fe8726eb6070ed6ea7368171cc09"
+      }
+    },
+    "regex": {
+      "version": "0.25.0",
+      "vcsRevision": "cb8b7bfdcdc2272aadf92153c668acd3c901bd6b",
+      "url": "https://github.com/nitely/nim-regex",
+      "downloadMethod": "git",
+      "dependencies": [
+        "unicodedb"
+      ],
+      "checksums": {
+        "sha1": "cb2e24397c051e55ad5b72b3c0d4f270a90084df"
+      }
+    }
+  },
+  "tasks": {}
+}
